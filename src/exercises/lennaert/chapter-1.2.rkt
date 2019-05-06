@@ -230,3 +230,93 @@
   (/ (- (sqrt 5) 2)))
 
 (fib 1)
+
+; Exponentiation
+(display "---- Exponentiation")
+
+(define (expt b n)
+  (define (expt-iter b counter product)
+    (if (= counter 0)
+        product
+        (expt-iter b (- counter 1) (* product b)))
+  )
+  (expt-iter b n 1))
+
+(display "---- expt")
+
+(expt 2 0)
+(expt 2 2)
+(expt 2 4)
+(expt 2 6)
+(expt 3 4)
+
+(define (square n) (* n n))
+(define (fast-expt b n)
+  (define (even? n) (= 0 (remainder n 2)))
+
+  (cond ((= n 0) 1)
+        ((even? n)
+         (square (fast-expt b (/ n 2))))
+        (else
+         (* b (fast-expt b (- n 1))))))
+
+(display "---- fast-expt")
+(fast-expt 2 0)
+(fast-expt 2 2)
+(fast-expt 2 3)
+(fast-expt 2 5)
+(fast-expt 3 4)
+
+(display "---- other-fast-expt")
+
+(define (other-fast-expt b n)
+  (define (other-fast-expt-iter b n a)
+    (cond ((= n 0) 1)
+          ((= n 1) a)
+          ((even? n) (other-fast-expt-iter b (/ n 2) (* a (square b))))
+          (else (other-fast-expt-iter b (- n 1) (* a b)))
+
+    )
+  )
+  (other-fast-expt-iter b n 1)
+)
+
+(other-fast-expt 2 0)
+(other-fast-expt 2 2)
+(other-fast-expt 2 3)
+(other-fast-expt 2 5)
+(other-fast-expt 3 4)
+
+(display "---- Multiplication")
+
+(display "---- mult")
+(define (mult a b)
+  (if (= b 0)
+      0
+      (+ a (mult a (- b 1)))
+      ))
+
+(mult 2 0)
+(mult 2 2)
+(mult 2 3)
+(mult 2 5)
+(mult 3 4)
+
+(define (fast-mult a b)
+  (define (doub n) (+ n n))
+
+  (define (even? n) (= 0 (remainder n 2)))
+
+  (cond ((= b 0) 0)
+        ((= b 1) a)
+        ((even? b)
+         (doub (fast-mult a (/ b 2))))
+        (else
+         (* b (fast-mult a (- b 1))))))
+
+(display "---- fast-mult")
+(fast-mult 2 0)
+(fast-mult 2 2)
+(fast-mult 2 3)
+(fast-mult 2 5)
+(fast-mult 3 4)

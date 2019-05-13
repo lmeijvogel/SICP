@@ -314,9 +314,95 @@
         (else
          (* b (fast-mult a (- b 1))))))
 
-(display "---- fast-mult")
+(display "---- fast-mult\n")
 (fast-mult 2 0)
 (fast-mult 2 2)
 (fast-mult 2 3)
 (fast-mult 2 5)
 (fast-mult 3 4)
+
+(display "---- gdc\n")
+
+(define (smallest-divisor n)
+  (find-divisor n 2))
+
+(define (find-divisor n test-divisor)
+  (cond ((> (square test-divisor) n) n)
+        ((divides? test-divisor n) test-divisor)
+        (else (find-divisor n (+ test-divisor 1))))
+)
+
+(define (divides? a b)
+  (= (remainder b a) 0))
+
+(define (prime? n)
+  (= n (smallest-divisor n)))
+
+(prime? 2)
+(prime? 8)
+(prime? 13)
+(prime? 27)
+(prime? 29)
+
+(display "---- gdc - Fermat\n")
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (square (expmod base (/ exp 2) m)) m))
+        (else
+         (remainder (* base (expmod base (- exp 1) m)) m))))
+(define (fermat-test n)
+  (define (try-it a)
+    (= (expmod a n n) a))
+
+  (try-it (+ 1 (random (- n 1)))))
+
+(define (fast-prime? n times)
+  (cond ((= times 0) true)
+          ((fermat-test n)
+            (fast-prime? n (- times 1)))
+        (else false)))
+
+(fast-prime? 2 10)
+(fast-prime? 8 10)
+(fast-prime? 13 10)
+(fast-prime? 27 10)
+(fast-prime? 29 10)
+
+(smallest-divisor 199)
+(smallest-divisor 1999)
+(smallest-divisor 19999)
+
+(define (time-printed-test n)
+  (newline)
+  (display n)
+  (start-prime-test n (runtime)))
+
+(define (start-prime-test n start-time)
+  (if (prime? n)
+      (report-time (- (runtime) start-time))))
+
+(define (report-time elapsed-time)
+  (display " *** ")
+  (display elapsed-time))
+
+(define (search-for-primes number min)
+  (define (report-and-continue number n start-time)
+    (display n)
+    (display " *** ")
+    (display (- (runtime) start-time))
+    (display "\n")
+    (search-for-primes (- number 1) (+ n 2)))
+
+  (define (search-for-primes-iter number n start-time)
+    (if (> number 0)
+        (if (prime? n)
+            (report-and-continue number n start-time)
+            (search-for-primes-iter number (+ n 2) start-time)
+            )))
+
+  (if (even? min)
+    (search-for-primes-iter number (+ min 1) (runtime))
+    (search-for-primes-iter number min (runtime))))
+
+(search-for-primes 8 1000000)
